@@ -1,0 +1,25 @@
+version: "3"
+
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: "muse"
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - "pgdata:/var/lib/postgresql/data"
+  
+
+  api:
+    build: API
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+
+
+volumes:
+  pgdata:
+    driver: "local"
