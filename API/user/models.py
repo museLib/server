@@ -22,7 +22,7 @@ class User(Base):
     """
     __tablename__ = 'user'
     id = Column(
-        'id', 
+        'id',
         INTEGER(),
         primary_key=True,
         autoincrement=True,
@@ -30,17 +30,17 @@ class User(Base):
     username = Column('username', String(140), nullable=False, unique=True)
     password = Column('password', String(128), nullable=False)
     email = Column('email', String(140))
-    date_registered = Column('date_registered', DateTime, default=datetime.now(), nullable=False)
+    date_registered = Column('date_registered', DateTime,
+                             default=datetime.now(), nullable=False)
 
     def __init__(self, username, password, email):
         self.username = username
         self.password = hashlib.sha512(password.encode()).hexdigest()
         self.email = email
-    
 
     def __str__(self):
         return f'{self.id} : {self.username}'
-    
+
 
 class GetTokenModel(BaseModel):
     """

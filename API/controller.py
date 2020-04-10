@@ -8,6 +8,5 @@ app = FastAPI(
 )
 
 
-
 async def index(request: Request):
     return {'message': 'Hello'}

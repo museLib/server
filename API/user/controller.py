@@ -24,7 +24,9 @@ def search_user_for_token(m: models.GetTokenModel) -> models.User:
     """
     session = db.Session()
     hashed_password = hashlib.sha512(m.password.encode()).hexdigest()
-    user = session.query(models.User).filter(models.User.username == m.username).filter(models.User.password == hashed_password).first()
+    user = session.query(models.User).filter(models.User.username == m.username).filter(
+        models.User.password == hashed_password
+    ).first()
     session.close()
 
     return user
@@ -34,7 +36,9 @@ def create_access_token(data: dict, expires_delta):
     to_encode = data.copy()
     expire = datetime.utcnow() + expires_delta
     to_encode['exp'] = expire.timestamp()
-    encode_jwt = jwt.encode(payload=to_encode, key=JWT_PASSWORD, algorithm=ALGORITHM)
+    encode_jwt = jwt.encode(
+        payload=to_encode, key=JWT_PASSWORD, algorithm=ALGORITHM
+    )
 
     return encode_jwt
 
@@ -55,16 +59,12 @@ def get_user_data(token: str = Depends(oauth2_scheme)) -> models.TokenData:
         username: str = payload.get('username')
         if username is None:
             raise credentials_exc
-        
+
         token_data = models.TokenData(username=username)
     except PyJWTError:
         raise credentials_exc
 
     return token_data
-
-
-
-
 
 
 async def get_token(m: models.GetTokenModel) -> models.GetTokenResponseModel:
@@ -77,10 +77,11 @@ async def get_token(m: models.GetTokenModel) -> models.GetTokenResponseModel:
             detail='Wrong username or password.',
             headers={'WWW-Authenticate': 'Bearer'},
         )
-    
+
     # Issue token
     token_expires = timedelta(minutes=TOKEN_EXPIRE_MIN)
-    access_token = create_access_token(data={'username': m.username}, expires_delta=token_expires)
+    access_token = create_access_token(
+        data={'username': m.username}, expires_delta=token_expires)
 
     return {'token': access_token, 'token_type': 'bearer'}
 
