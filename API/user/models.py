@@ -42,6 +42,15 @@ class User(Base):
         return f'{self.id} : {self.username}'
 
 
+class RegistUserModel(BaseModel):
+    """
+    /regist param
+    """
+    username: str
+    password: str
+    email: str
+
+
 class GetTokenModel(BaseModel):
     """
     /get_token param

@@ -1,4 +1,5 @@
-import db
+from db import db
+from user import models
 
 
 if __name__ == "__main__":

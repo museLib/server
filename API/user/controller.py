@@ -1,7 +1,8 @@
 from fastapi.security import OAuth2PasswordBearer
 from fastapi import HTTPException, Depends
-from starlette.status import HTTP_401_UNAUTHORIZED
+from starlette.status import HTTP_401_UNAUTHORIZED, HTTP_400_BAD_REQUEST
 from datetime import timedelta, datetime
+from sqlalchemy.exc import IntegrityError
 import jwt
 from jwt import PyJWTError
 import os
@@ -65,6 +66,33 @@ def get_user_data(token: str = Depends(oauth2_scheme)) -> models.TokenData:
         raise credentials_exc
 
     return token_data
+
+
+async def regist_user(m: models.RegistUserModel) -> models.GetTokenResponseModel:
+    """
+    Regist user & return token
+    """
+    # Regist to DB
+    try:
+        session = db.Session()
+        new_user = models.User(
+            username=m.username,
+            password=m.password,
+            email=m.email,
+        )
+        session.add(new_user)
+        session.commit()
+        session.close()
+    except IntegrityError:
+        raise HTTPException(
+            status_code=HTTP_400_BAD_REQUEST,
+            detail='Duplicate username',
+        )
+
+    # Issue access token
+    token = create_access_token(
+        {'username': m.username}, timedelta(minutes=TOKEN_EXPIRE_MIN))
+    return {'token': token, 'token_type': 'bearer'}
 
 
 async def get_token(m: models.GetTokenModel) -> models.GetTokenResponseModel:
