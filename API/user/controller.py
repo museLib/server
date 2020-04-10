@@ -1,8 +1,9 @@
 from fastapi.security import OAuth2PasswordBearer
-from fastapi import HTTPException
+from fastapi import HTTPException, Depends
 from starlette.status import HTTP_401_UNAUTHORIZED
 from datetime import timedelta, datetime
 import jwt
+from jwt import PyJWTError
 import os
 import hashlib
 import db.db as db
@@ -38,6 +39,31 @@ def create_access_token(data: dict, expires_delta):
     return encode_jwt
 
 
+def get_user_data(token: str = Depends(oauth2_scheme)) -> models.TokenData:
+    """
+    Search user with token
+    """
+
+    credentials_exc = HTTPException(
+        status_code=HTTP_401_UNAUTHORIZED,
+        detail="Wrong token",
+        headers={'WWW-Authenticate': 'Bearer'}
+    )
+
+    try:
+        payload = jwt.decode(token, JWT_PASSWORD, algorithms=[ALGORITHM])
+        username: str = payload.get('username')
+        if username is None:
+            raise credentials_exc
+        
+        token_data = models.TokenData(username=username)
+    except PyJWTError:
+        raise credentials_exc
+
+    return token_data
+
+
+
 
 
 
@@ -57,3 +83,7 @@ async def get_token(m: models.GetTokenModel) -> models.GetTokenResponseModel:
     access_token = create_access_token(data={'username': m.username}, expires_delta=token_expires)
 
     return {'token': access_token, 'token_type': 'bearer'}
+
+
+async def get_user(m: models.GetUserModel) -> models.TokenData:
+    return get_user_data(m.token)

@@ -62,7 +62,11 @@ class GetUserModel(BaseModel):
     """
     /get_user param
     """
+    token: str
 
 
-
-
+class TokenData(BaseModel):
+    """
+    /get_user return model
+    """
+    username: str
