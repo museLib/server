@@ -1,10 +1,13 @@
 from datetime import datetime
-from db import Base
+import db.db as db
 from sqlalchemy import Column, String, DateTime, ForeignKey
 from sqlalchemy.sql.functions import current_timestamp
 from sqlalchemy.dialects.postgresql import INTEGER, BOOLEAN
+from pydantic import BaseModel
 
 import hashlib
+
+Base = db.Base
 
 
 class User(Base):
@@ -24,7 +27,7 @@ class User(Base):
         primary_key=True,
         autoincrement=True,
     )
-    username = Column('username', String(140), nullable=False)
+    username = Column('username', String(140), nullable=False, unique=True)
     password = Column('password', String(128), nullable=False)
     email = Column('email', String(140))
     date_registered = Column('date_registered', DateTime, default=datetime.now(), nullable=False)
@@ -39,5 +42,27 @@ class User(Base):
         return f'{self.id} : {self.username}'
     
 
-    
+class GetTokenModel(BaseModel):
+    """
+    /get_token param
+    """
+    username: str
+    password: str
+
+
+class GetTokenResponseModel(BaseModel):
+    """
+    /get_token return model
+    """
+    token: str
+    token_type: str = 'bearer'
+
+
+class GetUserModel(BaseModel):
+    """
+    /get_user param
+    """
+
+
+
 

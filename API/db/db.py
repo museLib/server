@@ -8,4 +8,3 @@ RDB_PATH = f'postgresql://muse:{os.environ.get("DB_PASSWORD")}@db:5432/muse'
 
 engine = create_engine(RDB_PATH, echo=True)
 Session = sessionmaker(bind=engine)
-session = Session()
