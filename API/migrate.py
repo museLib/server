@@ -1,5 +1,6 @@
 from db import db
 from user import models
+from book import models
 
 
 if __name__ == "__main__":
