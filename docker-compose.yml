@@ -2,7 +2,7 @@ version: "3"
 
 services:
   db:
-    image: postgres
+    build: db
     environment:
       POSTGRES_USER: "muse"
       POSTGRES_PASSWORD: ${DB_PASSWORD}
